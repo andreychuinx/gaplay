@@ -9,10 +9,11 @@ export default {
   methods: {
     logOut () {
       var database = firebase.database()
-
       let user = JSON.parse(localStorage.getItem('user'))
       database.ref('user/'+user.uid).remove()
       this.$router.push('/')
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
     }
   }
 }

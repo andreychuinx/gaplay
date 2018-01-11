@@ -12,7 +12,7 @@
 <script>
 import firebase from 'firebase'
 export default {
-  name: 'HelloWorld',
+  name: 'Login',
   data () {
     return {
       msg: 'Welcome to Ga-Play!'
@@ -30,7 +30,10 @@ export default {
           console.log(result);
          var database = firebase.database()
          database.ref('user/'+result.user.uid).set({
-           name:result.user.displayName
+           name: result.user.displayName,
+           id: result.user.uid,
+           email: result.user.email,
+           photo: result.user.photoURL
          })
          var token = result.credential.accessToken;
          // The signed-in user info.
