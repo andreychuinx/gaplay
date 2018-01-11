@@ -1,31 +1,49 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-      <br>
-      <li><a href="http://vuejs-templates.github.io/webpack/" target="_blank">Docs for This Template</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <!-- <h2>Essential Links</h2> -->
+    <div class="container">
+      <h3>Please Sign In with </h3> <br>
+      <button type="button" v-on:click="auth" name="button"><img style="width:50px" src="https://cdn4.iconfinder.com/data/icons/new-google-logo-2015/400/new-google-favicon-128.png" alt=""></button>
+    </div>
   </div>
 </template>
 
 <script>
+import firebase from 'firebase'
 export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Ga-Play!'
+    }
+  },
+  methods: {
+    auth () {
+      let self = this
+      return new Promise((resolve, reject) => {
+        var provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('profile');
+        provider.addScope('email');
+        firebase.auth().signInWithPopup(provider)
+        .then(function(result) {
+          console.log(result);
+         var database = firebase.database()
+         database.ref('user/'+result.user.uid).set({
+           name:result.user.displayName
+         })
+         var token = result.credential.accessToken;
+         // The signed-in user info.
+         var user = result.user;
+         localStorage.setItem('token', token)
+         localStorage.setItem('user', JSON.stringify(user))
+         self.$router.push('/home')
+        })
+        .catch(function(err) {
+          console.log(err)
+          reject(err)
+        })
+      })
     }
   }
 }
