@@ -38,7 +38,7 @@ export default {
         
          var user = result.user;
          localStorage.setItem('user', JSON.stringify(user))
-         self.$router.push('/home')
+         self.$router.push('/createroom')
         })
         .catch(function(err) {
           console.log(err)
