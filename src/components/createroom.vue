@@ -11,17 +11,15 @@
           </ul>
         </div>
         <div class="card card-inverse card-info">
-          <ul class="list-group">
+          <ul class="list-group" v-for="u in userLogin">
             <li class="list-group-item">
-              <router-link class="navbar-brand link" :to="{ name: 'Blogdetail', params: {id: 123} }">
-                Holaaa
-              </router-link>
+              <h4>{{u.name}}</h4>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <section id="wrapper">
+    <div class="col-sm-6" id="wrapper">
       <div class="container py-3">
         <div class="row">
           <div class="col-md-12">
@@ -29,18 +27,23 @@
           </div>
         </div>
       </div>
-    </section>
+    </div>
   </div>
   </div>
 </template>
 
 <script>
-
+import { userRef } from '../firebase'
 export default {
   data() {
     return {
-      array: ['a']
+      userLogin: {
+
+      }
     }
+  },
+  firebase:{
+    userLogin: userRef
   },
 
   methods: {

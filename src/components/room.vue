@@ -10,23 +10,13 @@
             </li>
           </ul>
         </div>
-        <div class="card card-inverse card-info">
+        <div class="card card-inverse card-info" v-for="user in users">
           <ul class="list-group">
             <li class="list-group-item">
-              <h5 style="float:left;">User</h5>
-              <router-link class="navbar-brand link" style="float:right;":to="{ name: 'Blogdetail', params: {id: 123} }">
+              <h5 style="float:left;">{{user.name}}</h5>
+              <button role="button" @click="pushUser(user)" class="btn btn-sm btn-primary" style="float:right;">
                 invite
-              </router-link>
-            </li>
-          </ul>
-        </div>
-        <div class="card card-inverse card-info">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <h5 style="float:left;">User</h5>
-              <router-link class="navbar-brand link" style="float:right;":to="{ name: 'Blogdetail', params: {id: 123} }">
-                invite
-              </router-link>
+              </button>
             </li>
           </ul>
         </div>
@@ -36,7 +26,7 @@
       <div class="container py-3">
         <div class="row">
           <div class="col-md-12">
-            <button type="button" class="btn btn-success btn-lg" name="button">Start Game</button>
+            <button type="button" class="btn btn-success btn-lg button" name="button">Start Game</button>
           </div>
         </div>
       </div>
@@ -49,12 +39,10 @@
             </li>
           </ul>
         </div>
-        <div class="card card-inverse card-info">
+        <div class="card card-inverse card-info" v-for="p in player">
           <ul class="list-group">
             <li class="list-group-item">
-              <router-link class="navbar-brand link" :to="{ name: 'Blogdetail', params: {id: 123} }">
-                Holaaa
-              </router-link>
+              <h4>{{p.name}}</h4>
             </li>
           </ul>
         </div>
@@ -65,11 +53,28 @@
 </template>
 
 <script>
-
+import { userRef } from '../firebase'
 export default {
   data() {
     return {
-      array: ['a']
+      player: [],
+      users: {
+
+      },
+      statusTable: 'false'
+    }
+  },
+
+  firebase:{
+    users: userRef
+  },
+
+  methods: {
+    pushUser(user){
+      this.player.push(user)
+      this.users = this.users.filter(u => {
+        return u.id !== user.id
+      })
     }
   }
 
@@ -89,7 +94,7 @@ export default {
   width:100%;
   height:400px;
 }
-button{
+.button{
   position:relative;
   margin: -20px -50px;
   width:100px;
