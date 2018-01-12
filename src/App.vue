@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <img src="https://lh3.googleusercontent.com/2aN5njD39SNmhW-834U17qeyU-Ig-_1VBD_YAgeSDVm9Jvda0L8eHPGJOAQHrFUjww=w300">
     <router-view/>
   </div>
 </template>
