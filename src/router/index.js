@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import homePage from '@/components/homepage'
 import dominosPage from '@/components/dominos'
+
+import Login from '@/components/Login'
+import HomePage from '@/components/HomePage'
 
 Vue.use(Router)
 
@@ -10,13 +12,18 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'homepage',
-      component: homePage
+      name: 'loginPage',
+      component: Login
     },
     {
       path: '/dominos',
       name: 'dominos page',
       component: dominosPage
+    },
+    {
+      path: '/home',
+      name: 'HomePage',
+      component: HomePage
     }
   ]
 })
