@@ -11,7 +11,7 @@
 
 <script>
 import firebase from 'firebase'
-import {db} from '../main'
+import { usersRef } from '../firebase'
 export default {
   name: 'Login',
   data () {
@@ -30,16 +30,13 @@ export default {
         .then(function(result) {
           console.log(result);
          // var database = firebase.database()
-         db.ref('user/'+result.user.uid).set({
+         usersRef.push({
            name: result.user.displayName,
-           id: result.user.uid,
            email: result.user.email,
            photo: result.user.photoURL
          })
-         var token = result.credential.accessToken;
-         // The signed-in user info.
+        
          var user = result.user;
-         localStorage.setItem('token', token)
          localStorage.setItem('user', JSON.stringify(user))
          self.$router.push('/home')
         })

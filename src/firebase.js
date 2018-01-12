@@ -9,6 +9,6 @@ const app = initializeApp({
 })
 
 export const db = app.database()
-export const namesRef = db.ref('names')
+export const usersRef = db.ref('users')
 export const dominosRef = db.ref('dominos')
 export const roomsRef = db.ref('rooms')

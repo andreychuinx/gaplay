@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import dominosPage from '@/components/dominos'
 
 import Login from '@/components/Login'
-import HomePage from '@/components/HomePage'
+import HomePage from '@/components/homepage'
 
 Vue.use(Router)
 

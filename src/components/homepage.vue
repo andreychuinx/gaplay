@@ -2,7 +2,7 @@
   <div class="container">
     <div class="card" style="width: 30rem;">
       <div class="card-body">
-        <h5 class="card-title">Player {{test}}</h5>
+        <h5 class="card-title">Player</h5>
         <div class="row">
           <div class="col-md-4">
             <div class="row">
@@ -56,15 +56,19 @@
         <h5 class="card-title">Player 1</h5>
         <h5 class="card-title">Player 2</h5>
         <h5 class="card-title">Player 3</h5>
-        <p class="card-text">{{test}}</p>
+        <button type="button" v-on:click="logOut" name="button">LogOut</button>
         <a href="#" class="btn btn-primary"></a>
-      </div>{{gamePlayPlayersRef}}
+      </div>
     </div>
   </div>
 
 </template>
 <script>
-import { dominosRef, roomsRef, gamePlayPlayersRef } from '../firebase'
+import { 
+  dominosRef,
+  roomsRef,
+  usersRef
+  } from '../firebase'
 
 export default {
   data() {
@@ -82,8 +86,9 @@ export default {
       betRaise: '',
       statusBet: '',
       disabledButton: false,
-      test: localStorage.getItem('user'),
       room: '-L2cd9_fzpsEGcBTgWF4',
+      users: {},
+      user: JSON.parse(localStorage.getItem('user'))
     }
   },
   created() {
@@ -107,6 +112,7 @@ export default {
   firebase: {
     dominos: dominosRef,
     rooms: roomsRef,
+    users: usersRef,
   },
   methods: {
     checkGamePlay(key) {
@@ -180,6 +186,14 @@ export default {
         this.cardCount = countCard
       }
     },
+    logOut () {
+      var database = firebase.database()
+      let user = JSON.parse(localStorage.getItem('user'))
+      database.ref('user/'+user.uid).remove()
+      this.$router.push('/')
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
+    }
   },
 }
 </script>
