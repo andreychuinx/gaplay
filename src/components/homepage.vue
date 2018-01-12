@@ -2,16 +2,16 @@
   <div class="container">
     <div class="card" style="width: 30rem;">
       <div class="card-body">
-        <h5 class="card-title">Player 1</h5>
+        <h5 class="card-title">Player {{test}}</h5>
         <div class="row">
           <div class="col-md-4">
             <div class="row">
               <div class="col-md-12">
                 <p style="font-size: 60px;" v-if="loaded">
-                   {{firstCard}} {{secondCard}} {{cardCount}}
+                  {{firstCard}} {{secondCard}} {{cardCount}}
                 </p>
                 <p v-else>
-                  <button @click="myDomino('-L2a_su7ETDM2oO6nvQG')">Show Card</button>
+                  <button @click="myDomino(room)">Show Card</button>
                 </p>
               </div>
             </div>
@@ -24,8 +24,8 @@
             </div>
             <div class="row">
               <div class="col-md-12">
-                <button type="button" class="btn btn-success" @click="checkGamePlay('-L2a_su7ETDM2oO6nvQG')" :disabled="disabledButton">CHECK</button>
-                <button type="button" class="btn btn-danger" :disabled="disabledButton" @click="foldGamePlay('-L2a_su7ETDM2oO6nvQG')">FOLD</button>
+                <button type="button" class="btn btn-success" @click="checkGamePlay(room)" :disabled="disabledButton">CHECK</button>
+                <button type="button" class="btn btn-danger" :disabled="disabledButton" @click="foldGamePlay(room)">FOLD</button>
               </div>
             </div>
             <div class="row" style="margin-top: 10px">
@@ -35,11 +35,11 @@
                     <input type="text" class="form-control" id="inputCity" placeholder="Raise Here" v-model="betRaise">
                   </div>
                   <div class="form-group col-md-4">
-                    <button type="button" class="btn btn-primary" @click="raiseGamePlay('-L2a_su7ETDM2oO6nvQG')" :disabled="disabledButton">RAISE</button>
+                    <button type="button" class="btn btn-primary" @click="raiseGamePlay(room)" :disabled="disabledButton">RAISE</button>
 
                   </div>
                   <div class="col-md-12">
-                    {{statusBet}} 
+                    {{statusBet}}
                   </div>
                 </div>
               </div>
@@ -56,15 +56,15 @@
         <h5 class="card-title">Player 1</h5>
         <h5 class="card-title">Player 2</h5>
         <h5 class="card-title">Player 3</h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-      </div>secondCard
+        <p class="card-text">{{test}}</p>
+        <a href="#" class="btn btn-primary"></a>
+      </div>{{gamePlayPlayersRef}}
     </div>
   </div>
 
 </template>
 <script>
-import { dominosRef, roomsRef } from '../firebase'
+import { dominosRef, roomsRef, gamePlayPlayersRef } from '../firebase'
 
 export default {
   data() {
@@ -74,14 +74,16 @@ export default {
       gamePlay: {},
       name: '',
       dominosUsed: [],
-      room: {},
-      secondCard : '',
+      rooms: {},
+      secondCard: '',
       firstCard: '',
-      cardCount : null,
-      pointPlayer : 1000,
-      betRaise : '',
-      statusBet : '',
-      disabledButton : false
+      cardCount: null,
+      pointPlayer: 1000,
+      betRaise: '',
+      statusBet: '',
+      disabledButton: false,
+      test: localStorage.getItem('user'),
+      room: '-L2cd9_fzpsEGcBTgWF4',
     }
   },
   created() {
@@ -94,46 +96,50 @@ export default {
       roomsRef.push({
         creator: 'idPlayer create room',
         players: [
-          'idPlayer creator room',
-          'idPlayer yang di invite 1',
-          'idPlayer yang di invite 2',
-          'idPlayer yang di invite 3',
+          {
+            idPlayer: localStorage.getItem('user'),
+            pointBet: 1000,
+          },
         ],
-        gameplay: {
-          dominosUsed: this.dominosUsed,
-          
-        },
       })
     }
   },
   firebase: {
     dominos: dominosRef,
-    room: roomsRef,
+    rooms: roomsRef,
   },
   methods: {
-    checkGamePlay(key){
-      roomsRef.child(key).child('gameplay').update({
-        playerbet : {
-          idPlayer : 'idPlayer creator room',
-          statusBet : 'check',
-          pointBet : 100,
-        }
-      })
+    checkGamePlay(key) {
+      roomsRef
+        .child(key)
+        .child('gameplay')
+        .update({
+          playerbet: {
+            idPlayer: '1',
+            statusBet: 'check',
+            pointBet: 100,
+          },
+        })
       this.pointPlayer = this.pointPlayer - 100
       this.statusBet = 'You Check'
     },
-    raiseGamePlay(key){
+    raiseGamePlay(key) {
       let betRaise = Number(this.betRaise)
-      roomsRef.child(key).child('gameplay').child('playerbet').child('-L2ahqtrtwvrn1yYQ1H4').update({
-          idPlayer : 'idPlayer creator room',
-          statusBet : 'raise',
-          pointBet : betRaise,
-      })
+      roomsRef
+        .child(key)
+        .child('gameplay')
+        .child('playerbet')
+        .child('-L2ahqtrtwvrn1yYQ1H4')
+        .update({
+          idPlayer: 'idPlayer creator room',
+          statusBet: 'raise',
+          pointBet: betRaise,
+        })
       this.pointPlayer = this.pointPlayer - betRaise
       this.betRaise = ''
       this.statusBet = 'You Raise ' + betRaise + ' point'
     },
-    foldGamePlay(key){
+    foldGamePlay(key) {
       roomsRef.child(key).child('gameplay').child('playerbet').child('-L2ahqtrtwvrn1yYQ1H4').update({
           idPlayer : 'idPlayer creator room',
           statusBet : 'fold',
@@ -141,6 +147,10 @@ export default {
       })
       this.statusBet = 'You Fold'
       this.disabledButton = true
+      // roomsRef.child(key).child('players').push({
+      //       idPlayer: '2',
+      //       pointBet: 1000,
+      // })
     },
     myDomino(key) {
       let player = 4
@@ -162,15 +172,14 @@ export default {
       let numberFirstCard = Number(firstCard.number)
       let numberSecondCard = Number(secondCard.number)
       let countCard = numberFirstCard + numberSecondCard
-      if(countCard >= 20){
+      if (countCard >= 20) {
         this.cardCount = countCard - 20
-      }else if(countCard >= 10){
+      } else if (countCard >= 10) {
         this.cardCount = countCard - 10
-      }else{
+      } else {
         this.cardCount = countCard
       }
     },
   },
-  
 }
 </script>
