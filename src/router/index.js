@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import createroom from '@/components/createroom'
+import room from '@/components/room'
+
 import dominosPage from '@/components/dominos'
 
 import Login from '@/components/Login'
@@ -16,6 +19,16 @@ export default new Router({
       component: Login
     },
     {
+      path: '/createroom',
+      name: 'createroom',
+      component: createroom
+    },
+     {
+      path: '/room',
+      name: 'room',
+      component: room
+     },
+    {
       path: '/dominos',
       name: 'dominos page',
       component: dominosPage
@@ -25,5 +38,5 @@ export default new Router({
       name: 'HomePage',
       component: HomePage
     }
-  ]
+  ],
 })
