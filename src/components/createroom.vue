@@ -33,22 +33,31 @@
 </template>
 
 <script>
-import { userRef } from '../firebase'
+import { usersRef, roomsRef } from '../firebase'
 export default {
   data() {
     return {
       userLogin: {
-
-      }
+      },
+      rooms: {},
+      room: {}
     }
   },
   firebase:{
-    userLogin: userRef
+    userLogin: usersRef,
+    rooms: roomsRef
   },
 
   methods: {
     to_room(){
-      this.$router.push('/room')
+      let creator = JSON.parse(localStorage.getItem('user'))
+      roomsRef.push({
+        creator : creator,
+      })
+      .then(result => {
+        this.$router.push(`/room/${result.key}`)
+      })
+      // this.$router.push('/room')
     }
   }
 

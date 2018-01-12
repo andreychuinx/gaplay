@@ -21,12 +21,13 @@ export default new Router({
     {
       path: '/createroom',
       name: 'createroom',
-      component: createroom
+      component: createroom,
     },
      {
-      path: '/room',
+      path: '/room/:id',
       name: 'room',
-      component: room
+      component: room,
+      props : true
      },
     {
       path: '/dominos',
@@ -34,8 +35,8 @@ export default new Router({
       component: dominosPage
     },
     {
-      path: '/home',
-      name: 'HomePage',
+      path: '/game',
+      name: 'game',
       component: HomePage
     }
   ],

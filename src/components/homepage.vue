@@ -1,8 +1,23 @@
 <template>
   <div class="container">
+    <div class="card" style="width: 50rem; margin-top: 10px;">
+      <div class="card-body" v-for="(user, idx) in users">
+        <h3>{{user.name}}</h3>
+        <div v-if="rooms[0].gameplay">
+          <div v-if="rooms[0].gameplay.playerbet[user.name]">
+            <span>{{rooms[0].gameplay.playerbet[user.name].statusBet}}</span>
+            <span>{{rooms[0].gameplay.playerbet[user.name].pointBet}} Point</span>
+          </div>
+        </div>
+
+      </div>
+      <div>
+        <button @click="getWinner()">Whos Winner?</button>
+      </div>
+    </div>
     <div class="card" style="width: 30rem;">
       <div class="card-body">
-        <h5 class="card-title">Player</h5>
+        <h5 class="card-title">{{user.displayName}}</h5>
         <div class="row">
           <div class="col-md-4">
             <div class="row">
@@ -50,25 +65,12 @@
         </div>
       </div>
     </div>
-    <div class="card" style="width: 18rem; margin-top: 10px;">
-      <img class="card-img-top" src="" alt="Card image cap">
-      <div class="card-body">
-        <h5 class="card-title">Player 1</h5>
-        <h5 class="card-title">Player 2</h5>
-        <h5 class="card-title">Player 3</h5>
-        <button type="button" v-on:click="logOut" name="button">LogOut</button>
-        <a href="#" class="btn btn-primary"></a>
-      </div>
-    </div>
+
   </div>
 
 </template>
 <script>
-import { 
-  dominosRef,
-  roomsRef,
-  usersRef
-  } from '../firebase'
+import { dominosRef, roomsRef, usersRef } from '../firebase'
 
 export default {
   data() {
@@ -86,27 +88,17 @@ export default {
       betRaise: '',
       statusBet: '',
       disabledButton: false,
-      room: '-L2cd9_fzpsEGcBTgWF4',
+      room: '-L2dHUhMmPJidceaCi6E',
       users: {},
-      user: JSON.parse(localStorage.getItem('user'))
+      user: JSON.parse(localStorage.getItem('user')),
     }
   },
   created() {
-    while (this.dominosUsed.length < 8) {
+    localStorage.setItem('userId', '1')
+    while (this.dominosUsed.length < 4) {
       var randomNumber = Math.floor(Math.random() * 28) + 1
       if (this.dominosUsed.indexOf(randomNumber) > -1) continue
       this.dominosUsed[this.dominosUsed.length] = randomNumber
-    }
-    if ((this.dominosUsed.length = 8)) {
-      roomsRef.push({
-        creator: 'idPlayer create room',
-        players: [
-          {
-            idPlayer: localStorage.getItem('user'),
-            pointBet: 1000,
-          },
-        ],
-      })
     }
   },
   firebase: {
@@ -115,22 +107,59 @@ export default {
     users: usersRef,
   },
   methods: {
+    getWinner() {
+      const getWinner = function(arr, totalBet) {
+        var max = arr.reduce(function(a, b) {
+          return Math.max(a, b)
+        })
+        let playerWin = []
+        arr.forEach((card, players) => {
+          if (card == max) {
+            playerWin.push(players)
+          }
+        })
+        let dapat = Math.round(totalBet / playerWin.length)
+        return {
+          players: playerWin,
+          getPoint: dapat,
+        }
+      }
+    },
     checkGamePlay(key) {
+      let name = JSON.parse(localStorage.getItem('user'))
       roomsRef
         .child(key)
-        .child('gameplay')
-        .update({
-          playerbet: {
-            idPlayer: '1',
-            statusBet: 'check',
-            pointBet: 100,
-          },
+        .child(`gameplay/playerbet/${name.displayName}/`)
+        .set({
+          namaPlayer: this.user.displayName,
+          statusBet: 'check',
+          pointBet: 100,
+        })
+        .then(result => {
+          localStorage.setItem('idGamePlayUser', result.key)
         })
       this.pointPlayer = this.pointPlayer - 100
       this.statusBet = 'You Check'
     },
     raiseGamePlay(key) {
       let betRaise = Number(this.betRaise)
+      let name = JSON.parse(localStorage.getItem('user'))
+      roomsRef
+        .child(key)
+        .child(`gameplay/playerbet/${name.displayName}/`)
+        .set({
+          namaPlayer: this.user.displayName,
+          statusBet: 'raise',
+          pointBet: betRaise,
+        })
+        .then(result => {
+          localStorage.setItem('idGamePlayUser', result.key)
+        })
+      this.pointPlayer = this.pointPlayer - betRaise
+      this.betRaise = ''
+      this.statusBet = 'You Raise ' + betRaise + ' point'
+    },
+    foldGamePlay(key) {
       roomsRef
         .child(key)
         .child('gameplay')
@@ -138,19 +167,9 @@ export default {
         .child('-L2ahqtrtwvrn1yYQ1H4')
         .update({
           idPlayer: 'idPlayer creator room',
-          statusBet: 'raise',
-          pointBet: betRaise,
+          statusBet: 'fold',
+          pointBet: 100,
         })
-      this.pointPlayer = this.pointPlayer - betRaise
-      this.betRaise = ''
-      this.statusBet = 'You Raise ' + betRaise + ' point'
-    },
-    foldGamePlay(key) {
-      roomsRef.child(key).child('gameplay').child('playerbet').child('-L2ahqtrtwvrn1yYQ1H4').update({
-          idPlayer : 'idPlayer creator room',
-          statusBet : 'fold',
-          pointBet : 100,
-      })
       this.statusBet = 'You Fold'
       this.disabledButton = true
       // roomsRef.child(key).child('players').push({
@@ -160,18 +179,8 @@ export default {
     },
     myDomino(key) {
       let player = 4
-      let firstCard = ''
-      let secondCard = ''
-      this.room[0].players.forEach((player, idx) => {
-        if (player == 'idPlayer creator room') {
-          let numberPlayer = (idx + 1) * 2
-          // console.log(this.dominosUsed[numberPlayer - 2], 'ini number player')
-          let firstCardUsed = this.dominosUsed[numberPlayer - 1]
-          let secondCardUsed = this.dominosUsed[numberPlayer - 2]
-          firstCard = this.dominos[firstCardUsed]
-          secondCard = this.dominos[secondCardUsed]
-        }
-      })
+      let firstCard = this.dominos[this.dominosUsed[0]]
+      let secondCard = this.dominos[this.dominosUsed[1]]
       this.firstCard = firstCard.card
       this.secondCard = secondCard.card
       this.loaded = true
@@ -185,15 +194,17 @@ export default {
       } else {
         this.cardCount = countCard
       }
+      if()
+      roomsRef.child(`${key}/gameplay/bulkCountCard`).set(this.cardCount)
     },
-    logOut () {
+    logOut() {
       var database = firebase.database()
       let user = JSON.parse(localStorage.getItem('user'))
-      database.ref('user/'+user.uid).remove()
+      database.ref('user/' + user.uid).remove()
       this.$router.push('/')
       localStorage.removeItem('user')
       localStorage.removeItem('token')
-    }
+    },
   },
 }
 </script>
