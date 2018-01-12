@@ -11,6 +11,7 @@
 
 <script>
 import firebase from 'firebase'
+import {db} from '../main'
 export default {
   name: 'Login',
   data () {
@@ -28,8 +29,8 @@ export default {
         firebase.auth().signInWithPopup(provider)
         .then(function(result) {
           console.log(result);
-         var database = firebase.database()
-         database.ref('user/'+result.user.uid).set({
+         // var database = firebase.database()
+         db.ref('user/'+result.user.uid).set({
            name: result.user.displayName,
            id: result.user.uid,
            email: result.user.email,
